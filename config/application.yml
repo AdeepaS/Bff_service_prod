@@ -1,0 +1,21 @@
+config:
+  routes:
+    - path: /auth
+      url: http://localhost:8080/Authservice
+    - path: /admin
+      url: http://localhost:8080/Authservice
+    - path: /router-backend
+      url: http://localhost:8081
+    - path: /websocket-service
+      url: http://localhost:8082
+  cors:
+    allowed-origins:
+      - "https://vxsafehome.com"
+      - "https://demo.vxsafehome.com"
+      - "http://demo.vxsafehome.com"
+      - "http://192.168.10.126:8089"
+      - "http://192.168.1.147:8089"
+
+websocket:
+  backend:
+    url: ws://localhost:8082/vx/flutter
