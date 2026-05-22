@@ -299,9 +299,19 @@ public class ProxyController {
             return ResponseEntity.ok(new ApiResponse<>(false, HttpStatus.NOT_FOUND.value(), "Service not found", null));
         }
         if (proxyService.isAuthApiEndpoint(requestUri)) {
-            logger.info("[ProxyController:forwardPostRequest] Token validation for auth endpoint for Correlation ID: " + requestUri, correlationId);
+            logger.info("[ProxyController:forwardGetRequest] Token validation for auth endpoint for Correlation ID: " + requestUri, correlationId);
 
             return proxyService.forwardRequestWithToken(backendUrl + requestUri, headers, HttpMethod.GET );
+        } else if (proxyService.isAdminEndpoint(requestUri)) {
+            logger.info("[ProxyController:forwardGetRequest] Forwarding admin GET endpoint: {} for Correlation ID: {}", requestUri, correlationId);
+            
+            // Copy X-Admin-Key header if present
+            String adminKey = request.getHeader("X-Admin-Key");
+            if (adminKey != null && !adminKey.isEmpty()) {
+                headers.set("X-Admin-Key", adminKey);
+            }
+            
+            return proxyService.forwardRequestWithoutToken(backendUrl + requestUri, HttpMethod.GET, headers, requestBody);
         }
         return ResponseEntity.ok(new ApiResponse<>(false, HttpStatus.UNAUTHORIZED.value(), "Invalid endpoint", null));
     }
