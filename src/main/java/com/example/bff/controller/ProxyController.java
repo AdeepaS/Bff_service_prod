@@ -456,9 +456,9 @@ public class ProxyController {
                 }
 
                 // Extract and set refreshToken as cookie if present
-                if ((authDataNode != null && authDataNode.has("refreshToken")) || dataNode.has("refreshToken")) {
-                    String refreshToken = authDataNode != null && authDataNode.has("refreshToken") ?
-                            authDataNode.get("refreshToken").asText() : dataNode.get("refreshToken").asText();
+                if ((authDataNode != null && authDataNode.has("refresh_token")) || dataNode.has("refresh_token")) {
+                    String refreshToken = authDataNode != null && authDataNode.has("refresh_token") ?
+                            authDataNode.get("refresh_token").asText() : dataNode.get("refresh_token").asText();
                     logger.info("[ProxyController:processAuthResponse] RefreshToken found in auth response");
                     fingerprintUtils.setRefreshTokenCookie(response, refreshToken);
                     hasRefreshToken = true;
