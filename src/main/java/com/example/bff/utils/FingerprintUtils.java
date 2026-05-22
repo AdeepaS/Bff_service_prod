@@ -45,8 +45,8 @@ public class FingerprintUtils {
         fingerprintCookie.setPath(cookiePath);
         fingerprintCookie.setMaxAge(cookieMaxAge);
 
-        // Set SameSite attribute using header (Cookie API doesn't support SameSite directly)
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        // Set SameSite attribute using header
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 fingerprint,
@@ -73,7 +73,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(cookieMaxAge);
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 refreshToken,
@@ -99,7 +99,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(cookieMaxAge);
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 accessToken,
@@ -125,7 +125,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(cookieMaxAge);
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 userName,
@@ -151,7 +151,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(cookieMaxAge);
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 role,
@@ -177,7 +177,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(cookieMaxAge);
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 roleId,
@@ -203,7 +203,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(cookieMaxAge);
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=%s; Max-Age=%d; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 roleId,
@@ -241,7 +241,7 @@ public class FingerprintUtils {
         fingerprintCookie.setMaxAge(0); // Expire immediately
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=; Max-Age=0; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 cookiePath,
@@ -264,7 +264,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(0); // Expire immediately
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=; Max-Age=0; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 cookiePath,
@@ -287,7 +287,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(0); // Expire immediately
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=; Max-Age=0; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 cookiePath,
@@ -310,7 +310,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(0); // Expire immediately
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=; Max-Age=0; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 cookiePath,
@@ -333,7 +333,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(0); // Expire immediately
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=; Max-Age=0; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 cookiePath,
@@ -356,7 +356,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(0); // Expire immediately
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=; Max-Age=0; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 cookiePath,
@@ -379,7 +379,7 @@ public class FingerprintUtils {
         cookie.setMaxAge(0); // Expire immediately
 
         // Set SameSite attribute using header
-        String sameSite = isProduction ? "Strict" : cookieSameSite;
+        String sameSite = cookieSameSite;
         String cookieHeader = String.format("%s=; Max-Age=0; Path=%s; HttpOnly; %sSameSite=%s",
                 cookieName,
                 cookiePath,
