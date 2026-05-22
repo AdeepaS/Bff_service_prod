@@ -1,13 +1,13 @@
 config:
   routes:
     - path: /auth
-      url: http://localhost:8080/Authservice
+      url: ${AUTH_SERVICE_URL:http://localhost:8080}/Authservice
     - path: /admin
-      url: http://localhost:8080/Authservice
+      url: ${AUTH_SERVICE_URL:http://localhost:8080}/Authservice
     - path: /router-backend
-      url: http://localhost:8081
+      url: ${MAIN_SERVICE_URL:http://localhost:8081}
     - path: /websocket-service
-      url: http://localhost:8082
+      url: ${WEBSOCKET_SERVICE_URL:http://localhost:8082}
   cors:
     allowed-origins:
       - "https://vxsafehome.com"
