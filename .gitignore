@@ -55,7 +55,6 @@ temp/
 tmp/
 
 ### Security ###
-*.pem
 *.key
 *.keystore
 *.p12

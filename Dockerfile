@@ -12,6 +12,9 @@ WORKDIR /app
 # Copy the built jar from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
+# Copy the config directory (which contains application.properties and certs)
+COPY config ./config
+
 # Expose the default BFF port
 EXPOSE 8089
 
