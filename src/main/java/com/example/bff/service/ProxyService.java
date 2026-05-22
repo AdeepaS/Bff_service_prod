@@ -163,7 +163,7 @@ public class ProxyService {
 
     public boolean isAuthApiEndpoint(String requestUri) {
         return requestUri.contains("/view/allUsers") || requestUri.contains("/update/user") || requestUri.contains("/delete/user")
-                || requestUri.contains("/create/user") || requestUri.contains("/update/userPassword") || requestUri.contains("/update/firstLoginReset") ;
+                || requestUri.contains("/create/user") || requestUri.contains("/update/userPassword") || requestUri.contains("/update/firstLoginReset") || requestUri.contains("/email/");
     }
 
     public boolean isLogin(String requestUri) {
