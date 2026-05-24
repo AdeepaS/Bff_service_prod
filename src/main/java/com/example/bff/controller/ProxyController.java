@@ -147,7 +147,7 @@ public class ProxyController {
                 
         String queryString = request.getQueryString();
         String fullRequestUri = queryString != null ? backendPath + "?" + queryString : backendPath;
-        String backendUrl = routingService.determineBackendUrl(backendPath);
+        String backendUrl = routingService.determineBackendUrl(requestUri);
         if (backendUrl == null) {
             logger.info("[ProxyController:forwardGetRequest] Service not found for URI: {} for Correlation ID: {}", requestUri,correlationId );
             return ResponseEntity.ok(new ApiResponse<>(false, HttpStatus.NOT_FOUND.value(), "Service not found", null));
