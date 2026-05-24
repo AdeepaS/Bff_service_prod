@@ -4,7 +4,7 @@ config:
       url: ${AUTH_SERVICE_URL:http://localhost:8080}/Authservice
     - path: /admin
       url: ${AUTH_SERVICE_URL:http://localhost:8080}/Authservice
-    - path: /api
+    - path: /router-backend
       url: ${MAIN_SERVICE_URL:http://localhost:8081}
     - path: /websocket-service
       url: ${WEBSOCKET_SERVICE_URL:http://localhost:8082}
