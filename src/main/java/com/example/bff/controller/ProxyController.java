@@ -139,9 +139,15 @@ public class ProxyController {
         }
 
         String requestUri = request.getRequestURI().replace("/BFF/api/proxy/Main", "");
+        
+        // Strip /router-backend if present so it correctly matches the actual backend paths
+        String backendPath = requestUri.startsWith("/router-backend") 
+                ? requestUri.substring("/router-backend".length()) 
+                : requestUri;
+                
         String queryString = request.getQueryString();
-        String fullRequestUri = queryString != null ? requestUri + "?" + queryString : requestUri;
-        String backendUrl = routingService.determineBackendUrl(requestUri);
+        String fullRequestUri = queryString != null ? backendPath + "?" + queryString : backendPath;
+        String backendUrl = routingService.determineBackendUrl(backendPath);
         if (backendUrl == null) {
             logger.info("[ProxyController:forwardGetRequest] Service not found for URI: {} for Correlation ID: {}", requestUri,correlationId );
             return ResponseEntity.ok(new ApiResponse<>(false, HttpStatus.NOT_FOUND.value(), "Service not found", null));
@@ -337,6 +343,11 @@ public class ProxyController {
 
         String requestUri = request.getRequestURI().replace("/BFF/api/proxy/Main", "");
         logger.info("[ProxyController:MainForwardPostRequest] RequestUri : " + requestUri);
+        
+        // Strip /router-backend if present so it correctly matches the actual backend paths
+        String backendPath = requestUri.startsWith("/router-backend") 
+                ? requestUri.substring("/router-backend".length()) 
+                : requestUri;
 
         String backendUrl = routingService.determineBackendUrl(requestUri);
         if (backendUrl == null) {
@@ -351,9 +362,9 @@ public class ProxyController {
 
         // Skip token validation for auth endpoints (login/signup)
         if (proxyService.isMainServiceEndpoint(requestUri)) {
-            return proxyService.forwardRequestWithToken(backendUrl + requestUri, headers, requestBody, httpMethod);
+            return proxyService.forwardRequestWithToken(backendUrl + backendPath, headers, requestBody, httpMethod);
         }
-        return proxyService.forwardRequestWithToken(backendUrl + requestUri, headers, requestBody, httpMethod);
+        return proxyService.forwardRequestWithToken(backendUrl + backendPath, headers, requestBody, httpMethod);
     }
 
     private HttpHeaders addCorrelationIdHeader(HttpHeaders headers) {
