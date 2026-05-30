@@ -160,7 +160,7 @@ public class ProxyController {
     }
 
 
-    @RequestMapping(value = "/AuthForward/**", method = {RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
+    @RequestMapping(value = "/AuthForward/**", method = {RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS})
     public ResponseEntity<?> forwardPostRequest(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody(required = false) Map<String, Object> requestBody,
@@ -322,7 +322,7 @@ public class ProxyController {
         return ResponseEntity.ok(new ApiResponse<>(false, HttpStatus.UNAUTHORIZED.value(), "Invalid endpoint", null));
     }
 
-    @RequestMapping(value = "/Main/**", method = {RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH})
+    @RequestMapping(value = "/Main/**", method = {RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS})
     public ResponseEntity<?> MainForwardPostRequest(
             @RequestHeader(value = "Authorization", required = true) String token,
             @RequestBody(required = false) Map<String, Object> requestBody,
