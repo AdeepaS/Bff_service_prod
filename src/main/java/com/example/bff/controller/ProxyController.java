@@ -153,6 +153,11 @@ public class ProxyController {
             return ResponseEntity.ok(new ApiResponse<>(false, HttpStatus.NOT_FOUND.value(), "Service not found", null));
         }
 
+        if (requestUri.contains("/api/notifications/stream") || requestUri.contains("/api/messages/stream")) {
+            logger.info("[ProxyController:forwardGetRequest] Streaming SSE endpoint matched: {}", requestUri);
+            return forwardSseStream(backendUrl + fullRequestUri, request);
+        }
+
         // Allow public endpoints without token validation
         if (requestUri.contains("/router-backend/api/hotels") || 
             requestUri.contains("/router-backend/api/categories") ||
@@ -616,6 +621,59 @@ public class ProxyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse<>(false, HttpStatus.INTERNAL_SERVER_ERROR.value(),
                             "Error processing authentication response: " + e.getMessage(), null));
+        }
+    }
+
+    private ResponseEntity<org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody> forwardSseStream(
+            String targetUrl, HttpServletRequest request) {
+        try {
+            java.net.URL url = new java.net.URL(targetUrl);
+            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(0); // Infinite read timeout for SSE stream
+            connection.setConnectTimeout(5000);
+
+            // Copy headers from incoming request to backend connection
+            java.util.Enumeration<String> headerNames = request.getHeaderNames();
+            if (headerNames != null) {
+                while (headerNames.hasMoreElements()) {
+                    String headerName = headerNames.nextElement();
+                    String headerValue = request.getHeader(headerName);
+                    if (!headerName.equalsIgnoreCase("host") && !headerName.equalsIgnoreCase("content-length")) {
+                        connection.setRequestProperty(headerName, headerValue);
+                    }
+                }
+            }
+
+            int responseCode = connection.getResponseCode();
+            
+            // Build response headers to return to client
+            HttpHeaders responseHeaders = new HttpHeaders();
+            for (Map.Entry<String, java.util.List<String>> entry : connection.getHeaderFields().entrySet()) {
+                if (entry.getKey() != null) {
+                    responseHeaders.put(entry.getKey(), entry.getValue());
+                }
+            }
+
+            org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody responseBody = outputStream -> {
+                try (java.io.InputStream inputStream = connection.getInputStream()) {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                        outputStream.flush();
+                    }
+                } catch (java.io.IOException e) {
+                    logger.warn("[ProxyController:forwardSseStream] Stream connection closed: {}", e.getMessage());
+                } finally {
+                    connection.disconnect();
+                }
+            };
+
+            return new ResponseEntity<>(responseBody, responseHeaders, HttpStatusCode.valueOf(responseCode));
+        } catch (Exception e) {
+            logger.error("[ProxyController:forwardSseStream] Error streaming from backend: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
