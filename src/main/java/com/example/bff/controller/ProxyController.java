@@ -153,6 +153,14 @@ public class ProxyController {
             return ResponseEntity.ok(new ApiResponse<>(false, HttpStatus.NOT_FOUND.value(), "Service not found", null));
         }
 
+        // Allow public endpoints without token validation
+        if (requestUri.contains("/router-backend/api/hotels") || 
+            requestUri.contains("/router-backend/api/categories") ||
+            requestUri.contains("/router-backend/api/qr/public-metadata")) {
+            logger.info("[ProxyController:forwardGetRequest] Public endpoint: {}. Skipping token validation.", requestUri);
+            return proxyService.forwardRequestWithoutToken(backendUrl + fullRequestUri, HttpMethod.GET, headers, null);
+        }
+
         if (proxyService.isMainServiceEndpoint(requestUri)) {
             return proxyService.forwardRequestWithToken(backendUrl + fullRequestUri, headers, HttpMethod.GET);
         }
@@ -255,8 +263,14 @@ public class ProxyController {
             boolean requestProcessed = fingerprintUtils.processLogoutRequest(request, headers, correlationId);
 
             if (!requestProcessed) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new ApiResponse<>(false, HttpStatus.BAD_REQUEST.value(), "Refresh token is missing or invalid", null));
+                logger.info("[ProxyController:forwardPostRequest] Refresh token not found in cookies, checking if this is a token-based (mobile) request...");
+                String authHeaderVal = request.getHeader(HttpHeaders.AUTHORIZATION);
+                if (authHeaderVal != null && authHeaderVal.startsWith("Bearer ")) {
+                    logger.info("[ProxyController:forwardPostRequest] Bearer token present. Forwarding logout without refresh token to auth service.");
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new ApiResponse<>(false, HttpStatus.BAD_REQUEST.value(), "Refresh token is missing or invalid", null));
+                }
             }
 
             // Forward the request to the auth service
@@ -308,6 +322,9 @@ public class ProxyController {
             logger.info("[ProxyController:forwardGetRequest] Token validation for auth endpoint for Correlation ID: " + requestUri, correlationId);
 
             return proxyService.forwardRequestWithToken(backendUrl + requestUri, headers, HttpMethod.GET );
+        } else if (requestUri.contains("/auth/hotels")) {
+            logger.info("[ProxyController:forwardGetRequest] Public GET endpoint: {}. Skipping token validation.", requestUri);
+            return proxyService.forwardRequestWithoutToken(backendUrl + requestUri, HttpMethod.GET, headers, null);
         } else if (proxyService.isAdminEndpoint(requestUri)) {
             logger.info("[ProxyController:forwardGetRequest] Forwarding admin GET endpoint: {} for Correlation ID: {}", requestUri, correlationId);
             

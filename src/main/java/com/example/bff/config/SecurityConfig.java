@@ -81,7 +81,14 @@ public class SecurityConfig {
                         .requestMatchers("/BFF/api/device-assignment/**").permitAll()  // Device assignment API for Main Service -> WebSocket Service
                         .requestMatchers("/BFF/api/proxy/AuthForward/auth/api/**").authenticated()
                         .requestMatchers("/BFF/api/proxy/AuthForward/**").permitAll()
-                        .requestMatchers("/BFF/api/proxy/auth/session/**").authenticated()
+                        // Public read-only endpoints for registration & metadata
+                        .requestMatchers(org.springframework.http.HttpMethod.GET,
+                                "/BFF/api/proxy/Main/router-backend/api/hotels",
+                                "/BFF/api/proxy/Main/router-backend/api/categories",
+                                "/BFF/api/proxy/Main/router-backend/api/qr/public-metadata/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST,
+                                "/BFF/api/proxy/Main/router-backend/api/qr/public-report").permitAll()
+                        .requestMatchers("/BFF/api/proxy/auth/session", "/BFF/api/proxy/auth/session/**").authenticated()
                         .requestMatchers("/BFF/api/proxy/Main/**").authenticated()
                         .requestMatchers("/latest/**").denyAll()
                         .anyRequest().denyAll()
