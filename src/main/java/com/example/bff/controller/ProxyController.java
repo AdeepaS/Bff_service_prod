@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.bff.utils.MultipartInputStreamFileResource;
 import org.springframework.util.LinkedMultiValueMap;
@@ -39,6 +40,9 @@ public class ProxyController {
 
     @Autowired
     private FingerprintUtils fingerprintUtils;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @org.springframework.beans.factory.annotation.Value("${app.auth.mode:hybrid}")
     private String authMode;
@@ -673,6 +677,55 @@ public class ProxyController {
             return new ResponseEntity<>(responseBody, responseHeaders, HttpStatusCode.valueOf(responseCode));
         } catch (Exception e) {
             logger.error("[ProxyController:forwardSseStream] Error streaming from backend: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/Main/router-backend/api/uploads/{filename:.+}")
+    public ResponseEntity<byte[]> forwardUploads(
+            @PathVariable String filename,
+            HttpServletRequest request) {
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers = addCorrelationIdHeader(headers);
+        String correlationId = headers.getFirst("X-Correlation-Id");
+        
+        String requestUri = "/api/uploads/" + filename;
+        String backendUrl = routingService.determineBackendUrl(requestUri);
+        if (backendUrl == null) {
+            logger.error("[ProxyController:forwardUploads] Service not found for URI: {} for Correlation ID: {}", requestUri, correlationId);
+            return ResponseEntity.notFound().build();
+        }
+        
+        String targetUrl = backendUrl + requestUri;
+        logger.info("[ProxyController:forwardUploads] Proxying binary file from: {} for Correlation ID: {}", targetUrl, correlationId);
+        
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && !authHeader.isEmpty()) {
+            headers.set("Authorization", authHeader);
+        }
+
+        try {
+            ResponseEntity<byte[]> response = restTemplate.exchange(
+                targetUrl,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                byte[].class
+            );
+            
+            HttpHeaders responseHeaders = new HttpHeaders();
+            if (response.getHeaders().getContentType() != null) {
+                responseHeaders.setContentType(response.getHeaders().getContentType());
+            } else {
+                responseHeaders.setContentType(MediaType.IMAGE_JPEG);
+            }
+            
+            return ResponseEntity.status(response.getStatusCode())
+                    .headers(responseHeaders)
+                    .body(response.getBody());
+                    
+        } catch (Exception e) {
+            logger.error("[ProxyController:forwardUploads] Error proxying file for Correlation ID: {}. Error: {}", correlationId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
